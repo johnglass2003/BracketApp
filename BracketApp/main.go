@@ -1,42 +1,43 @@
 package main
 
 import (
+	"BracketApp/src/server/utils"
 	"fmt"
-	"math"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gorilla/mux"
 )
 
-type Member struct {
-	name string
-}
-
-type Match struct {
-	member1     Member
-	member2     Member
-	member1Wins uint
-	member2Wins uint
-}
-
 func main() {
-	fmt.Print("Type a number of rounds: ")
-	var rounds float64
+	r := mux.NewRouter()
 
-	fmt.Print("Type a number of rounds: ")
-	fmt.Scan(&rounds)
-	rounds = math.Pow(2, math.Ceil(math.Log(rounds)/math.Log(2)))
+	r.HandleFunc("/hello-world", helloWorld)
 
-	var r int = int(rounds)
-	var matches = make([]Match, r)
+	http.Handle("/", r)
 
-	UNINITIALIZED_MEMBER := Member{name: "UNINITIALIZED"}
-	UNINITIALIZED_MATCH := Match{member1: UNINITIALIZED_MEMBER, member2: UNINITIALIZED_MEMBER, member1Wins: 0, member2Wins: 0}
-
-	for i := 0; i < r; i++ {
-		matches = append(matches, UNINITIALIZED_MATCH)
+	srv := &http.Server{
+		Handler: r,
+		Addr:    ":" + os.Getenv("PORT"),
 	}
 
-	for i := 0; i < r; i++ {
-		fmt.Println(matches[i].member1.name + " " + matches[i].member2.name)
+	log.Fatal(srv.ListenAndServe())
+}
+
+func helloWorld(w http.ResponseWriter, r *http.Request) {
+	var data = struct {
+		Title string `json:"title"`
+	}{
+		Title: "Golang + Angular Starter Kit",
 	}
 
-	fmt.Println("Hello!")
+	jsonBytes, err := utils.StructToJSON(data)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonBytes)
+	return
 }
