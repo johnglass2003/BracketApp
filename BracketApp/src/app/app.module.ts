@@ -11,8 +11,6 @@ import { MyMatchComponentComponent } from './my-match.component/my-match.compone
   ],
   imports: [
     NgTournamentTreeModule,
-    NgttSingleEliminationTree,
-    NgttDoubleEliminationTree,
     BrowserModule
   ],
   providers: [],
